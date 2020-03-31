@@ -23,14 +23,12 @@ const fetchUser = () => {
     }, 2000);
   });
 };
-
-Rx.Observable.fromEvent(button, 'click')
-  .switchMap(event => checkAuth())
-  .switchMap(isAuth => {
-    if (isAuth) {
-      return fetchUser()
-    }
-  })
-  .subscribe(user => {
-    setText("User fetched: " + user.name)
-  })
+//ES8 syntax
+button.addEventListener("click", async () => {
+  const isAuth = await checkAuth()
+  let user = null;
+  if (isAuth) {
+    user = await fetchUser()
+  }
+  setText(user.name)
+});
