@@ -1,4 +1,4 @@
-//Callbacks
+
 const button = document.querySelector("button");
 const div = document.querySelector("div");
 
@@ -7,31 +7,30 @@ const setText = text => {
 };
 
 const checkAuth = () => {
-  return new Promise((resolve, reject) => {
+  return Rx.Observable.create(observer => {
     setText("Checking Auth...");
     setTimeout(() => {
-      resolve(true);
+      observer.next(true);
     }, 2000);
-  });
+  }); 
 };
 
 const fetchUser = () => {
-  return new Promise((resolve, reject) => {
-    setText("Fetching User...");
+  return Rx.Observable.create(observer => {
+    setText('Fetching User...')
     setTimeout(() => {
-      resolve({ name: "Max" });
+      observer.next({name: 'Max'});
     }, 2000);
   });
 };
 
-button.addEventListener("click", () => {
-  checkAuth()
-    .then(isAuth => {
-      if (isAuth) {
-        return fetchUser();
-      }
-    })
-    .then(user => {
-      setText("User fetched: " +user.name);
-    });
-});
+Rx.Observable.fromEvent(button, 'click')
+  .switchMap(event => checkAuth())
+  .switchMap(isAuth => {
+    if (isAuth) {
+      return fetchUser()
+    }
+  })
+  .subscribe(user => {
+    setText("User fetched: " + user.name)
+  })
